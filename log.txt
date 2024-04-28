@@ -1,0 +1,64 @@
+interfaces: [
+    NetworkInterface {
+        name: "s1-eth1",
+        description: "",
+        index: 2214,
+        mac: Some(
+            66:7d:ad:07:b9:6f,
+        ),
+        ips: [
+            V6(
+                Ipv6Network {
+                    addr: fe80::647d:adff:fe07:b96f,
+                    prefix: 64,
+                },
+            ),
+        ],
+        flags: 69699,
+    },
+    NetworkInterface {
+        name: "s1-eth2",
+        description: "",
+        index: 2215,
+        mac: Some(
+            ee:43:ab:e3:6b:c9,
+        ),
+        ips: [
+            V6(
+                Ipv6Network {
+                    addr: fe80::ec43:abff:fee3:6bc9,
+                    prefix: 64,
+                },
+            ),
+        ],
+        flags: 69699,
+    },
+]
+Entering packet loop
+received packet: EthernetPacket { destination : 33:33:ff:07:b9:6f, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:ff:c3:e1:b2, source : 2a:30:10:c3:e1:b2, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:16, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:16, source : 2a:30:10:c3:e1:b2, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:16, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:02, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:16, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:fb, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:fb, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:16, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:16, source : 2a:30:10:c3:e1:b2, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:02, source : 2a:30:10:c3:e1:b2, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:fb, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:fb, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:fb, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:16, source : 2a:30:10:c3:e1:b2, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:16, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:fb, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : ff:ff:ff:ff:ff:ff, source : 2a:30:10:c3:e1:b2, ethertype : EtherType(2054),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:fb, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : ff:ff:ff:ff:ff:ff, source : 2a:30:10:c3:e1:b2, ethertype : EtherType(2054),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:fb, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : ff:ff:ff:ff:ff:ff, source : 2a:30:10:c3:e1:b2, ethertype : EtherType(2054),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:fb, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:02, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:02, source : 2a:30:10:c3:e1:b2, ethertype : EtherType(34525),  }
+received packet: EthernetPacket { destination : 33:33:00:00:00:fb, source : 66:7d:ad:07:b9:6f, ethertype : EtherType(34525),  }
