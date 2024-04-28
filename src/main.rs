@@ -42,6 +42,7 @@ impl EthRouter {
                 eprintln!("Failed to parse packet: {:#?}", i1_pkt);
                 continue;
             };
+            println!("received packet: {:#?}", eth_pkt);
 
             i2_tx.build_and_send(1, eth_pkt.packet().len(), &mut |outbound| {
                 let mut outbound = MutableEthernetPacket::new(outbound)
