@@ -15,7 +15,7 @@ class EtherSwitch(Switch):
         super(EtherSwitch, self).__init__(name, **kwargs)
 
     def start(self, controllers):
-        self.cmd(RELEASE_EXECUTABLE)
+        self.cmd(f'{RELEASE_EXECUTABLE} > log.txt')
 
     def stop(self):
         self.cmd(f'kill {RELEASE_EXECUTABLE}')
