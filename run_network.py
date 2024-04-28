@@ -38,8 +38,8 @@ def run():
     net = Mininet(topo=topo)
     net.start()
 
-    net.pingAll()
-    # CLI(net)
+    # net.pingAll()
+    CLI(net)
 
     net.stop()
 
