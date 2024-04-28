@@ -26,8 +26,8 @@ class EtherTopo(Topo):
         # TODO: make the topology parameter driven
         s1 = self.addSwitch('s1', cls=EtherSwitch)
 
-        h1 = self.addHost('h1', ip=None)
-        h2 = self.addHost('h2', ip=None)
+        h1 = self.addHost('h1')
+        h2 = self.addHost('h2')
 
         self.addLink(h1, s1)
         self.addLink(h2, s1)
