@@ -17,6 +17,8 @@ impl EthRouter {
             .filter(|intf| intf.name.contains("-eth"))
             .collect();
 
+        println!("interfaces: {:#?}", mn_intf);
+
         let Ok(Ethernet(_i1_tx, mut i1_rx)) = datalink::channel(&mn_intf[0], Config::default())
         else {
             bail!(
@@ -33,8 +35,11 @@ impl EthRouter {
             );
         };
 
+        println!("Entering packet loop");
+
         while let Ok(i1_pkt) = i1_rx.next() {
             let Some(eth_pkt) = EthernetPacket::new(i1_pkt) else {
+                eprintln!("Failed to parse packet: {:#?}", i1_pkt);
                 continue;
             };
 
