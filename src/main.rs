@@ -1,30 +1,52 @@
+use std::time::Duration;
+
 use anyhow::bail;
 use pnet::{
-    datalink::{self, Channel::Ethernet, Config, NetworkInterface},
+    datalink::{
+        self, Channel::Ethernet, Config, DataLinkReceiver, DataLinkSender, NetworkInterface,
+    },
     packet::{
         ethernet::{EthernetPacket, MutableEthernetPacket},
         MutablePacket, Packet,
     },
 };
 
-struct EthRouter {}
+struct EthPort {
+    intf: NetworkInterface,
+    tx: Box<dyn DataLinkSender>,
+    rx: Box<dyn DataLinkReceiver>,
+}
+
+impl EthPort {
+    /// Builds an abstraction that supports sending and receiving network packets from
+    /// an ethernet port. Receive blocks until a packet arries or `poll_timeout` has elapsed.
+    pub fn build(intf: NetworkInterface, poll_timeout: Option<Duration>) -> anyhow::Result<Self> {
+        let mut port_cfg = Config::default();
+        port_cfg.read_timeout = poll_timeout;
+        let Ok(Ethernet(tx, rx)) = datalink::channel(&intf, Config::default()) else {
+            bail!("Failed to parse ethernet channel on interface: {:#?}", intf);
+        };
+        Ok(Self { intf, tx, rx })
+    }
+}
+
+struct EthRouter {
+    ports: Vec<EthPort>,
+}
 
 impl EthRouter {
-    pub fn build() -> anyhow::Result<Self> {
+    pub fn build(poll_timeout: Option<Duration>) -> anyhow::Result<Self> {
         // filters out all ethernet interfaces that don't have mininet names
-        let mn_intf: Vec<NetworkInterface> = datalink::interfaces()
+        let ports = datalink::interfaces()
             .into_iter()
             .filter(|intf| intf.name.contains("-eth"))
-            .collect();
+            .map(|intf| EthPort::build(intf, poll_timeout))
+            .collect::<anyhow::Result<Vec<EthPort>>>()?;
 
-        println!("interfaces: {:#?}", mn_intf);
-
+        /*
         let Ok(Ethernet(_i1_tx, mut i1_rx)) = datalink::channel(&mn_intf[0], Config::default())
         else {
-            bail!(
-                "Failed to parse ethernet channel on interface: {:#?}",
-                mn_intf[0]
-            );
+
         };
 
         let Ok(Ethernet(mut i2_tx, _i2_rx)) = datalink::channel(&mn_intf[1], Config::default())
@@ -51,11 +73,12 @@ impl EthRouter {
             });
         }
 
-        Ok(EthRouter {})
+        */
+        Ok(EthRouter { ports })
     }
 }
 
 fn main() -> anyhow::Result<()> {
-    EthRouter::build()?;
+    EthRouter::build(Some(Duration::from_micros(100)))?;
     Ok(())
 }
