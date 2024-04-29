@@ -99,9 +99,10 @@ impl EthRouter {
         // no data copying except from the ethernet inflow buffer into
         // the outflow buffer.
 
+        let mn_name = format!("{switch_name}-eth");
         for intf in datalink::interfaces()
             .into_iter()
-            .filter(|intf| intf.name.contains(switch_name))
+            .filter(|intf| intf.name.contains(&mn_name))
         {
             println!("intf: {:#?}", intf);
             let (port, port_rx) = EthPort::build(intf, eth_poll_timeout)?;
