@@ -49,7 +49,7 @@ impl EthPort {
         Ok((
             Self {
                 mac,
-                state: PortState::Forward,
+                state: PortState::Block,
                 tx,
             },
             rx,
@@ -240,7 +240,7 @@ impl EthRouter {
 
                 // first take the smaller root id
                 // then take the shortest path to the smallest root id
-
+                println!("curr root: {:?}", self.curr_bpdu.root_id());
                 println!("handling bpdu: {:#?}", neighbor);
                 let agree_on_root = match neighbor.root_id().cmp(&self.curr_bpdu.root_id()) {
                     Ordering::Less => {
