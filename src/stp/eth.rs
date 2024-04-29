@@ -240,6 +240,8 @@ impl EthRouter {
                     continue;
                 };
 
+                println!("{:?}", self.curr_bpdu);
+
                 // first take the smaller root id
                 // then take the shortest path to the smallest root id
                 let agree_on_root = match neighbor.root_id().cmp(&self.curr_bpdu.root_id()) {
@@ -259,7 +261,6 @@ impl EthRouter {
                     "The code below only applies to switches that already agree on the root"
                 );
 
-                println!("{:?}", self.curr_bpdu);
                 match (neighbor.cost() + 1).cmp(&self.curr_bpdu.cost()) {
                     Ordering::Less => {
                         self.reset_root(portnum_in, neighbor, &eth_pkt);
