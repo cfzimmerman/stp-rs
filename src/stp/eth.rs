@@ -211,7 +211,7 @@ impl EthRouter {
         let mut inbound = mem::take(&mut self.inbound);
         assert_eq!(inbound.len(), self.ports.len());
         loop {
-            if dbg!(self.last_resent_bpdu.elapsed()) < self.bpdu_resend_timeout {
+            if self.bpdu_resend_timeout < self.last_resent_bpdu.elapsed() {
                 println!("Broadcasting bpdu: {:#?}", self.broadcast_bpdu());
                 self.broadcast_bpdu();
                 self.last_resent_bpdu = Instant::now();
