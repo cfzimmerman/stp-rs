@@ -147,6 +147,7 @@ impl EthRouter {
             eprintln!("Denied client packet on a blocked port: {:#?}", eth_pkt);
             return;
         };
+        println!("Forwarding data packet");
 
         // self learning
         *self.fwd_table.entry(eth_pkt.get_source()).or_default() = portnum_in;
@@ -235,8 +236,7 @@ impl EthRouter {
                 };
 
                 let Some(neighbor) = EthPort::try_routing(&eth_pkt) else {
-                    // println!("Forwarding data packet");
-                    // self.fwd_client(portnum_in, &eth_pkt);
+                    self.fwd_client(portnum_in, &eth_pkt);
                     continue;
                 };
 
