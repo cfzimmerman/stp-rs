@@ -8,11 +8,7 @@ use pnet::{
         MutablePacket, Packet,
     },
 };
-use std::{
-    io::ErrorKind,
-    thread::sleep,
-    time::{Duration, Instant},
-};
+use std::{io::ErrorKind, time::Duration};
 
 #[derive(Debug, PartialEq, Eq)]
 enum EthState {
@@ -55,11 +51,11 @@ struct EthRouter;
 
 impl EthRouter {
     pub fn run(poll_timeout: Option<Duration>) -> anyhow::Result<()> {
-        // filters out all ethernet interfaces that don't have mininet names
         let interfaces = datalink::interfaces();
         let mut ingress = Vec::with_capacity(interfaces.len());
         let mut egress = Vec::with_capacity(interfaces.len());
 
+        // filters out all ethernet interfaces that don't have mininet names
         for intf in datalink::interfaces()
             .into_iter()
             .filter(|intf| intf.name.contains("-eth"))
@@ -79,6 +75,7 @@ impl EthRouter {
                     Ok(p) => p,
                     Err(e) => {
                         if e.kind() == ErrorKind::TimedOut {
+                            println!("Timeout error");
                             continue;
                         }
                         bail!("Exiting on io error: {:#?}", e);
