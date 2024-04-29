@@ -210,11 +210,14 @@ impl EthRouter {
     pub fn run(mut self) -> anyhow::Result<()> {
         let mut inbound = mem::take(&mut self.inbound);
         assert_eq!(inbound.len(), self.ports.len());
+        {
+            assert_eq!(self.switch_id, self.curr_bpdu.root_id());
+            println!("init sw id: {:?}", self.switch_id);
+        }
         loop {
             if self.bpdu_resend_timeout < self.last_resent_bpdu.elapsed() {
                 self.broadcast_bpdu();
                 self.last_resent_bpdu = Instant::now();
-                println!("Broadcasting bpdu: {:#?}", self.last_resent_bpdu);
             }
 
             for (portnum_in, rx) in inbound.iter_mut().enumerate() {
@@ -233,7 +236,6 @@ impl EthRouter {
                 };
 
                 let Some(neighbor) = EthPort::try_routing(&eth_pkt) else {
-                    println!("Sink hole data packet");
                     // println!("Forwarding data packet");
                     // self.fwd_client(portnum_in, &eth_pkt);
                     continue;
@@ -241,18 +243,14 @@ impl EthRouter {
 
                 // first take the smaller root id
                 // then take the shortest path to the smallest root id
-                println!("curr root: {:?}", self.curr_bpdu.root_id());
-                println!("handling bpdu: {:#?}", neighbor);
                 let agree_on_root = match neighbor.root_id().cmp(&self.curr_bpdu.root_id()) {
                     Ordering::Less => {
                         self.reset_root(portnum_in, neighbor, &eth_pkt);
                         self.broadcast_bpdu();
-                        println!("Found a better root, broadcasting");
                         continue;
                     }
                     Ordering::Greater => {
                         self.broadcast_bpdu();
-                        println!("They sent a greater root, broadcasting");
                         continue;
                     }
                     Ordering::Equal => true,
@@ -264,20 +262,16 @@ impl EthRouter {
 
                 match (neighbor.cost() + 1).cmp(&self.curr_bpdu.cost()) {
                     Ordering::Less => {
-                        println!("Got a lower cost path, taking it");
                         self.reset_root(portnum_in, neighbor, &eth_pkt);
                         self.broadcast_bpdu();
                     }
                     Ordering::Equal => {
-                        println!("Got an equal cost path, blocking them");
                         self.ports[portnum_in].state = PortState::Block;
                     }
                     Ordering::Greater => {
                         self.ports[portnum_in].state = if neighbor.bridge_id() == self.switch_id {
-                            println!("Got a greater cost path, forwarding");
                             PortState::Forward
                         } else {
-                            println!("Got a greater cost path, blocking");
                             PortState::Block
                         };
                     }
