@@ -74,8 +74,8 @@ impl EthRouter {
                 let bytes = match port.rx.next() {
                     Ok(p) => p,
                     Err(e) => {
+                        println!("Io error: {:#?}", e);
                         if e.kind() == ErrorKind::TimedOut {
-                            println!("Timeout error");
                             continue;
                         }
                         bail!("Exiting on io error: {:#?}", e);
@@ -104,6 +104,6 @@ impl EthRouter {
 }
 
 fn main() -> anyhow::Result<()> {
-    EthRouter::run(Some(Duration::from_micros(1000)))?;
+    EthRouter::run(Some(Duration::from_millis(1)))?;
     Ok(())
 }
