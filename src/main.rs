@@ -76,6 +76,8 @@ impl EthRouter {
                 };
 
                 let rec_start = Instant::now();
+
+                println!("{:?}", Instant::now());
                 let bytes = match port.rx.next() {
                     Ok(p) => p,
                     Err(e) => {
@@ -83,11 +85,9 @@ impl EthRouter {
                         if e.kind() == ErrorKind::TimedOut {
                             continue;
                         }
-                        sleep(Duration::from_millis(5));
-                        continue;
+                        bail!("Exiting on io error: {:#?}", e);
                     }
                 };
-                println!("waited {:#?} for packet", rec_start.elapsed());
 
                 let Some(eth_pkt) = EthernetPacket::new(bytes) else {
                     eprintln!("Failed to parse packet: {:#?}", bytes);
