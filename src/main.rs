@@ -75,13 +75,9 @@ impl EthRouter {
                     continue;
                 };
 
-                let rec_start = Instant::now();
-
-                println!("{:?}", Instant::now());
                 let bytes = match port.rx.next() {
                     Ok(p) => p,
                     Err(e) => {
-                        println!("waited {:#?} for error {:?}", rec_start.elapsed(), e);
                         if e.kind() == ErrorKind::TimedOut {
                             continue;
                         }
