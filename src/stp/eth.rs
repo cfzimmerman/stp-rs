@@ -85,6 +85,7 @@ impl EthRouter {
     /// mininet ports. Assigns a mac address to represent the whole switch and
     /// establishes an initial Bpdu for this switch.
     pub fn build(
+        switch_name: &str,
         bpdu_resend_timeout: Duration,
         eth_poll_timeout: Option<Duration>,
     ) -> anyhow::Result<Self> {
@@ -100,7 +101,7 @@ impl EthRouter {
 
         for intf in datalink::interfaces()
             .into_iter()
-            .filter(|intf| intf.name.contains("-eth"))
+            .filter(|intf| intf.name.contains(switch_name))
         {
             println!("intf: {:#?}", intf);
             let (port, port_rx) = EthPort::build(intf, eth_poll_timeout)?;
