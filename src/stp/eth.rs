@@ -104,7 +104,6 @@ impl EthRouter {
             .into_iter()
             .filter(|intf| intf.name.contains(&mn_name))
         {
-            println!("intf: {:#?}", intf);
             let (port, port_rx) = EthPort::build(intf, eth_poll_timeout)?;
             switch_id = switch_id.min(port.mac);
             ports.push(port);
@@ -213,10 +212,7 @@ impl EthRouter {
     pub fn run(mut self) -> anyhow::Result<()> {
         let mut inbound = mem::take(&mut self.inbound);
         assert_eq!(inbound.len(), self.ports.len());
-        {
-            assert_eq!(self.switch_id, self.curr_bpdu.root_id());
-            println!("init sw id: {:?}", self.switch_id);
-        }
+
         loop {
             if self.bpdu_resend_timeout < self.last_resent_bpdu.elapsed() {
                 self.broadcast_bpdu();
@@ -263,6 +259,7 @@ impl EthRouter {
                     "The code below only applies to switches that already agree on the root"
                 );
 
+                println!("{:?}", self.curr_bpdu);
                 match (neighbor.cost() + 1).cmp(&self.curr_bpdu.cost()) {
                     Ordering::Less => {
                         self.reset_root(portnum_in, neighbor, &eth_pkt);
