@@ -233,8 +233,9 @@ impl EthRouter {
                 };
 
                 let Some(neighbor) = EthPort::try_routing(&eth_pkt) else {
-                    println!("Forwarding data packet");
-                    self.fwd_client(portnum_in, &eth_pkt);
+                    println!("Sink hole data packet");
+                    // println!("Forwarding data packet");
+                    // self.fwd_client(portnum_in, &eth_pkt);
                     continue;
                 };
 
