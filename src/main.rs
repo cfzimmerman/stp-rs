@@ -99,41 +99,10 @@ impl EthRouter {
                 }
             }
         }
-        /*
-        let Ok(Ethernet(_i1_tx, mut i1_rx)) = datalink::channel(&mn_intf[0], Config::default())
-        else {
-
-        };
-
-        let Ok(Ethernet(mut i2_tx, _i2_rx)) = datalink::channel(&mn_intf[1], Config::default())
-        else {
-            bail!(
-                "Failed to parse ethernet channel on interface: {:#?}",
-                mn_intf[1]
-            );
-        };
-
-        println!("Entering packet loop");
-
-        while let Ok(i1_pkt) = i1_rx.next() {
-            let Some(eth_pkt) = EthernetPacket::new(i1_pkt) else {
-                eprintln!("Failed to parse packet: {:#?}", i1_pkt);
-                continue;
-            };
-            println!("received packet: {:#?}", eth_pkt);
-
-            i2_tx.build_and_send(1, eth_pkt.packet().len(), &mut |outbound| {
-                let mut outbound = MutableEthernetPacket::new(outbound)
-                    .expect("MutableEthernetPacket must construct successfully");
-                outbound.clone_from(&eth_pkt);
-            });
-        }
-
-        */
     }
 }
 
 fn main() -> anyhow::Result<()> {
-    EthRouter::run(Some(Duration::from_micros(1000)))?;
+    EthRouter::run(Some(Duration::from_micros(0)))?;
     Ok(())
 }
