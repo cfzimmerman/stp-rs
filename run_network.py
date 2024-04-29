@@ -16,7 +16,6 @@ class EtherSwitch(Switch):
         super(EtherSwitch, self).__init__(name, **kwargs)
 
     def start(self, controllers):
-        print(f"logfile: logs/{self.name}-log.txt")
         self.cmd(f'{RELEASE_EXECUTABLE} > "logs/{self.name}-log.txt" &')
 
     def stop(self):
@@ -27,7 +26,7 @@ class EtherTopo(Topo):
     def build(self):
         # TODO: make the topology parameter driven
 
-        s1 = self.addSwitch('s1', cls=EtherSwitch)
+        s1 = self.addSwitch('s1', cls=EtherSwitch, mac='00:00:00:00:00:01')
         s2 = self.addSwitch('s2', cls=EtherSwitch)
         s3 = self.addSwitch('s3', cls=EtherSwitch)
 
