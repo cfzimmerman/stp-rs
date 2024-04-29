@@ -212,9 +212,9 @@ impl EthRouter {
         assert_eq!(inbound.len(), self.ports.len());
         loop {
             if self.bpdu_resend_timeout < self.last_resent_bpdu.elapsed() {
-                println!("Broadcasting bpdu: {:#?}", self.broadcast_bpdu());
                 self.broadcast_bpdu();
                 self.last_resent_bpdu = Instant::now();
+                println!("Broadcasting bpdu: {:#?}", self.last_resent_bpdu);
             }
 
             for (portnum_in, rx) in inbound.iter_mut().enumerate() {
