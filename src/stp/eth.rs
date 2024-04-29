@@ -102,8 +102,8 @@ impl EthRouter {
             .into_iter()
             .filter(|intf| intf.name.contains("-eth"))
         {
+            println!("intf: {:#?}", intf);
             let (port, port_rx) = EthPort::build(intf, eth_poll_timeout)?;
-            println!("mac: {:?}", port.mac);
             switch_id = switch_id.min(port.mac);
             ports.push(port);
             inbound.push(port_rx);
