@@ -74,6 +74,7 @@ impl EthRouter {
                 let bytes = match port.rx.next() {
                     Ok(p) => p,
                     Err(e) => {
+                        println!("io error: {:#?}", e);
                         if e.kind() == ErrorKind::TimedOut {
                             continue;
                         }
