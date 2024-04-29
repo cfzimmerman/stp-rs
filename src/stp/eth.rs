@@ -147,7 +147,7 @@ impl EthRouter {
             eprintln!("Denied client packet on a blocked port: {:#?}", eth_pkt);
             return;
         };
-        println!("Forwarding data packet");
+        // println!("Forwarding data packet");
 
         // self learning
         *self.fwd_table.entry(eth_pkt.get_source()).or_default() = portnum_in;
@@ -216,6 +216,7 @@ impl EthRouter {
 
         loop {
             if self.bpdu_resend_timeout < self.last_resent_bpdu.elapsed() {
+                println!("{:#?}", self.fwd_table);
                 self.broadcast_bpdu();
                 self.last_resent_bpdu = Instant::now();
             }
