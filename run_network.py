@@ -12,10 +12,11 @@ class EtherSwitch(Switch):
     runs the executable for each mininet switch. '''
 
     def __init__(self, name, **kwargs):
+        self.name = name
         super(EtherSwitch, self).__init__(name, **kwargs)
 
     def start(self, controllers):
-        self.cmd(f'{RELEASE_EXECUTABLE} > log.txt &')
+        self.cmd(f'{RELEASE_EXECUTABLE} > logs/{self.name}-log.txt &')
 
     def stop(self):
         self.cmd(f'kill {RELEASE_EXECUTABLE}')
