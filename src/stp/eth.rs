@@ -261,7 +261,7 @@ impl EthRouter {
                     "The code below only applies to switches that already agree on the root"
                 );
 
-                match neighbor.cost().cmp(&(self.curr_bpdu.cost() + 1)) {
+                match (neighbor.cost() + 1).cmp(&self.curr_bpdu.cost()) {
                     Ordering::Less => {
                         println!("Got a lower cost path, taking it");
                         self.reset_root(portnum_in, neighbor, &eth_pkt);
