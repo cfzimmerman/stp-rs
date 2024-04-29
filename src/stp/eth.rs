@@ -1,4 +1,4 @@
-use super::bpdu::{self, Bpdu, BpduBuf};
+use super::bpdu::{Bpdu, BpduBuf};
 use anyhow::bail;
 use pnet::{
     datalink::{

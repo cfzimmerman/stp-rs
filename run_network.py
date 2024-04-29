@@ -24,13 +24,25 @@ class EtherSwitch(Switch):
 class EtherTopo(Topo):
     def build(self):
         # TODO: make the topology parameter driven
+
         s1 = self.addSwitch('s1', cls=EtherSwitch)
+        s2 = self.addSwitch('s2', cls=EtherSwitch)
+        s3 = self.addSwitch('s3', cls=EtherSwitch)
 
         h1 = self.addHost('h1')
         h2 = self.addHost('h2')
 
         self.addLink(h1, s1)
-        self.addLink(h2, s1)
+        self.addLink(s1, s2)
+        self.addLink(s2, s3)
+        self.addLink(s3, h2)
+        # s1 = self.addSwitch('s1', cls=EtherSwitch)
+
+        # h1 = self.addHost('h1')
+        # h2 = self.addHost('h2')
+
+        # self.addLink(h1, s1)
+        # self.addLink(h2, s1)
 
 
 def run():
