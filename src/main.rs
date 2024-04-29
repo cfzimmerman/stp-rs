@@ -33,7 +33,7 @@ impl EthPort {
     ) -> anyhow::Result<(Self, Box<dyn DataLinkSender>)> {
         let mut port_cfg = Config::default();
         port_cfg.read_timeout = poll_timeout;
-        let Ok(Ethernet(tx, rx)) = datalink::channel(&intf, Config::default()) else {
+        let Ok(Ethernet(tx, rx)) = datalink::channel(&intf, port_cfg) else {
             bail!("Failed to parse ethernet channel on interface: {:#?}", intf);
         };
         Ok((
@@ -104,6 +104,6 @@ impl EthRouter {
 }
 
 fn main() -> anyhow::Result<()> {
-    EthRouter::run(Some(Duration::from_millis(1)))?;
+    EthRouter::run(Some(Duration::from_micros(1000)))?;
     Ok(())
 }
