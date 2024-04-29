@@ -7,21 +7,64 @@ use pnet::{
         ethernet::{EthernetPacket, MutableEthernetPacket},
         MutablePacket, Packet,
     },
+    util::MacAddr,
 };
 use std::{io::ErrorKind, time::Duration};
 
+/// This is a reserved mac address often used for layer 2 protocols like STP
+/// https://notes.networklessons.com/stp-bpdu-destination-mac-address
+const BPDU_MAC: MacAddr = MacAddr(0x01, 0x80, 0xc2, 0x0, 0x0, 0x0);
+
 #[derive(Debug, PartialEq, Eq)]
-enum EthState {
+enum PortState {
+    /// The port is the switch's path to the root. All traffic is served.
+    Root,
+    /// This port is part of a loop. Only BPDU packets are accepted.
     Block,
+    /// This port services other nodes' access to the root. All traffic is served.
     Forward,
-    // Listen
-    // Learn
+}
+
+/// A bridge protocol data unit packet. Note, this is not authentic. I'm
+/// choosing a subset of fields and using aligned data types instead of
+/// protocol field sizes. This is simply for ease of implementation.
+/// Assumes packets are unversioned and for spanning tree.
+/// https://support.huawei.com/enterprise/en/doc/EDOC1000178168/e99e1364/bpdu-format
+#[repr(C)]
+#[derive(bytemuck::AnyBitPattern, Copy, Clone)]
+struct Bpdu {
+    root_cost: u8,
+    root_id: [u8; 6],
+    bridge_id: [u8; 6],
+}
+
+impl Bpdu {
+    /// Builds a new bpdu type, casting MacAddresses into raw octets to satisfy bytemuck.
+    pub fn new(root_cost: u8, root_id: MacAddr, bridge_id: MacAddr) -> Self {
+        Bpdu {
+            root_cost,
+            root_id: root_id.octets(),
+            bridge_id: bridge_id.octets(),
+        }
+    }
+
+    pub fn get_cost(&self) -> u8 {
+        self.root_cost
+    }
+
+    pub fn get_root_id(&self) -> MacAddr {
+        self.root_id.into()
+    }
+
+    pub fn get_bridge_id(&self) -> MacAddr {
+        self.bridge_id.into()
+    }
 }
 
 struct EthPort {
     intf: NetworkInterface,
     rx: Box<dyn DataLinkReceiver>,
-    state: EthState,
+    state: PortState,
 }
 
 impl EthPort {
@@ -40,10 +83,20 @@ impl EthPort {
             Self {
                 intf,
                 rx,
-                state: EthState::Forward,
+                state: PortState::Forward,
             },
             tx,
         ))
+    }
+
+    /// Returns whether a packet is marked for the purpose of ethernet routing
+    /// Panics if the packet matches the BPDU mac address but cannot be serialized.
+    /// Such a case indicates a bug or some serious misunderstanding of the network.
+    pub fn try_routing<'a>(pkt: &'a EthernetPacket) -> Option<&'a Bpdu> {
+        if BPDU_MAC != pkt.get_destination() {
+            return None;
+        };
+        Some(bytemuck::from_bytes(pkt.payload()))
     }
 }
 
@@ -60,21 +113,29 @@ impl EthRouter {
             .into_iter()
             .filter(|intf| intf.name.contains("-eth"))
         {
+            println!("{:#?}", intf);
             let (port, tx) = EthPort::build(intf, poll_timeout)?;
             ingress.push(port);
             egress.push(tx);
         }
 
         loop {
+            // There were two accessible ways to run this given the constraints of
+            // the pnet channel: (1) spawn a thread for each port and send
+            // messages to a central handler via channel, or (2) poll ethernet
+            // ports in a busy loop.
+            // I'd do (1) if running a single process. However, I need to be able to
+            // run +16 switches on a single emulated network on qemu on a macbook. There
+            // will be zero free cores no matter what, so a busy loop actually seems
+            // more efficient than multithreading + blocking in this situation.
             for (portnum_in, port) in ingress.iter_mut().enumerate() {
-                let EthState::Forward = port.state else {
+                let PortState::Forward = port.state else {
                     continue;
                 };
 
                 let bytes = match port.rx.next() {
                     Ok(p) => p,
                     Err(e) => {
-                        println!("Io error: {:#?}", e);
                         if e.kind() == ErrorKind::TimedOut {
                             continue;
                         }

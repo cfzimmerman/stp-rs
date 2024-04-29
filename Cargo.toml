@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.82"
+bytemuck = { version = "1.15.0", features = ["derive"] }
 pnet = "0.34.0"
