@@ -36,8 +36,10 @@ class EtherTopo(Topo):
 
         self.addLink(h1, s1)
         self.addLink(s1, s2)
+        self.addLink(s1, s3)
         self.addLink(s2, s3)
         self.addLink(s3, h2)
+
         # s1 = self.addSwitch('s1', cls=EtherSwitch)
 
         # h1 = self.addHost('h1')
