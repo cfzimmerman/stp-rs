@@ -8,7 +8,7 @@ use pnet::{
         MutablePacket, Packet,
     },
 };
-use std::{io::ErrorKind, time::Duration};
+use std::{io::ErrorKind, thread::sleep, time::Duration};
 
 #[derive(Debug, PartialEq, Eq)]
 enum EthState {
@@ -78,7 +78,8 @@ impl EthRouter {
                         if e.kind() == ErrorKind::TimedOut {
                             continue;
                         }
-                        bail!("Port error: {:#?}", e);
+                        sleep(Duration::from_millis(5));
+                        continue;
                     }
                 };
 
