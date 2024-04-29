@@ -8,7 +8,11 @@ use pnet::{
         MutablePacket, Packet,
     },
 };
-use std::{io::ErrorKind, thread::sleep, time::Duration};
+use std::{
+    io::ErrorKind,
+    thread::sleep,
+    time::{Duration, Instant},
+};
 
 #[derive(Debug, PartialEq, Eq)]
 enum EthState {
@@ -71,10 +75,11 @@ impl EthRouter {
                     continue;
                 };
 
+                let rec_start = Instant::now();
                 let bytes = match port.rx.next() {
                     Ok(p) => p,
                     Err(e) => {
-                        println!("io error: {:#?}", e);
+                        println!("waited {:#?} for error {:?}", rec_start.elapsed(), e);
                         if e.kind() == ErrorKind::TimedOut {
                             continue;
                         }
@@ -82,6 +87,7 @@ impl EthRouter {
                         continue;
                     }
                 };
+                println!("waited {:#?} for packet", rec_start.elapsed());
 
                 let Some(eth_pkt) = EthernetPacket::new(bytes) else {
                     eprintln!("Failed to parse packet: {:#?}", bytes);
@@ -105,6 +111,6 @@ impl EthRouter {
 }
 
 fn main() -> anyhow::Result<()> {
-    EthRouter::run(Some(Duration::from_micros(0)))?;
+    EthRouter::run(Some(Duration::from_micros(1000)))?;
     Ok(())
 }
