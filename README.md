@@ -1,11 +1,10 @@
 To do:
 
-- Clippy and constants to clean up the rust code
-  - Checkpoint that
-- Add more graceful handling for errors
-- Final review
 - How to evaluate performance?
+- Final review
 - Report
+
+- Missing: soft state, failure recovery
 
 Setup:
 

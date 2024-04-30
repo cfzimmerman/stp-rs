@@ -44,7 +44,7 @@ class EtherTopo(Topo):
 
         for host in hosts:
             print(f"adding host: {host}")
-            self.addHost(host)
+            print(self.addHost(host))
 
         for switch in self.topo["topology"]["switches"]:
             print(f"adding switch: {switch}")
