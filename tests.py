@@ -32,7 +32,7 @@ def main():
         return
 
     if mode == "perf":
-        TEST_LEN_SEC = 60
+        TEST_LEN_SEC = 30
 
         topo = test_runner.EtherTopo("./topo/grid.json")
 
@@ -52,6 +52,9 @@ def main():
         server.cmd("mkdir -p logs && iperf -s > ./logs/iperf-server.txt &")
         client.cmd(
             f"iperf -t {TEST_LEN_SEC} -c {server.IP()} > ./logs/iperf-client.txt")
+
+        print("test complete, cleaning up")
+        server.cmd('kill %iperf')
 
         net.stop()
         return
