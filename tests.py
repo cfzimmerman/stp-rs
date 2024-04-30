@@ -45,12 +45,8 @@ def main():
         print(f"sleeping for {sleep_sec} sec, let STP set up")
         time.sleep(sleep_sec)
 
-        server = net.get('h5')
-        client = net.get('h1')
-        server_out, client_out = net.iperf([server, client], seconds=5)
-
-        print(server_out)
-        print(client_out)
+        ploss = net.ping(hosts=['h1', 'h5'], seconds=10)
+        print(ploss)
 
         '''
 
