@@ -229,7 +229,7 @@ impl EthRouter {
         assert_eq!(inbound.len(), self.ports.len());
 
         let time_entered = Instant::now();
-        let mut init_phase = false;
+        let mut init_phase = true;
 
         loop {
             if init_phase && time_entered.elapsed() > startup_duration {
@@ -242,7 +242,7 @@ impl EthRouter {
                     println!("port: {:?}", port.state);
                 }
                 println!("Exit init, fwd: {:#?}", self.fwd_table);
-                init_phase = true;
+                init_phase = false;
             }
             if self.bpdu_resend_timeout < self.last_resent_bpdu.elapsed() {
                 self.broadcast_bpdu();
