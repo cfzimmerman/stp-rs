@@ -48,6 +48,7 @@ def main():
         net.stop()
         return
 
+    print(args[1])
     raise Exception(f"unrecognized mode, must be 'corr' or 'perf': {args[1]}")
 
 
