@@ -49,12 +49,10 @@ def main():
         client = net.get('h1')
 
         print(f"running iperf for {TEST_LEN_SEC} seconds")
-        server.cmd("mkdir -p logs && iperf -s > ./logs/iperf-server.txt &")
+        server.cmd("mkdir -p logs && iperf -s -V -o ./logs/iperf-server.txt &")
         client.cmd(
-            f"iperf -t {TEST_LEN_SEC} -c {server.IP()} > ./logs/iperf-client.txt")
+            f"iperf -t {TEST_LEN_SEC} -c {server.IP()} -o ./logs/iperf-client.txt")
 
-        # cmdPrint instead?
-        # set port?
         print("test complete, cleaning up")
         time.sleep(2)
         server.cmd('kill %iperf')
