@@ -14,7 +14,7 @@ class EtherSwitch(Switch):
     ''' A custom extension of the base mininet switch that
     runs the executable for each mininet switch. '''
 
-    def __init__(self, name, **kwargs):
+    def __init__(self, name: str, **kwargs):
         self.name = name
         super(EtherSwitch, self).__init__(name, **kwargs)
 
@@ -27,7 +27,8 @@ class EtherSwitch(Switch):
 
 
 class EtherTopo(Topo):
-    def __init__(self, topo_file: str):
+    def __init__(self, topo_file: str, **kwargs):
+        super(EtherTopo, self).__init__(**kwargs)
         self.topo_file = topo_file
 
     def build(self):
