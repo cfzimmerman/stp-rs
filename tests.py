@@ -32,6 +32,9 @@ def main():
 
     if mode == "perf":
         topo = test_runner.EtherTopo("./topo/grid.json")
+
+        print(topo.hosts())
+
         net = test_runner.Mininet(topo=topo)
         net.start()
 
