@@ -1,4 +1,10 @@
-todo:
+To do:
+
+- Clippy and constants to clean up the rust code
+  - Checkpoint that
+- Add more graceful handling for errors
+- Final review
+- Report
 
 Setup:
 
