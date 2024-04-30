@@ -50,12 +50,13 @@ def main():
 
         print(f"running iperf for {TEST_LEN_SEC} seconds")
         server.cmd("mkdir -p logs && iperf -s -V -o ./logs/iperf-server.txt &")
-        client.cmd(
+        client_out = client.cmd(
             f"iperf -t {TEST_LEN_SEC} -c {server.IP()} -o ./logs/iperf-client.txt")
+        print(client_out)
 
         print("test complete, cleaning up")
         time.sleep(2)
-        server.cmd('kill %iperf')
+        server.cmd('pkill iperf')
 
         net.stop()
         return
