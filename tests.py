@@ -29,6 +29,7 @@ def main():
         test_runner.run(False, "./topo/triangle.json")
         test_runner.run(False, "./topo/grid.json")
         test_runner.run(False, "./topo/ftree16.json")
+        return
 
     if mode == "perf":
         topo = test_runner.EtherTopo("./topo/grid.json")
@@ -45,6 +46,9 @@ def main():
         # run iperf!
 
         net.stop()
+        return
+
+    raise Exception(f"unrecognized mode, must be 'corr' or 'perf': {args[1]}")
 
 
 if __name__ == "__main__":
