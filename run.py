@@ -92,13 +92,26 @@ def run(interactive: bool, topo_file: str):
 
 
 def usage():
-    print("**.py [bool interactive] [topology filepath]")
-    print("sudo python run.py true ./topos/topo.json")
+    print("**.py [interactive/quiet -i/q] [topology filepath]")
+    print("sudo python run.py -q ./topos/topo.json")
 
 
-if __name__ == "__main__":
+def main():
     args = sys.argv
     if len(args) != 3:
         usage()
+        return
+
+    interactive = None
+    if args[1] == "-i":
+        interactive = True
+    elif args[1] == "-q":
+        interactive = False
     else:
-        run(bool(args[1]), args[2])
+        usage()
+        return
+    run(interactive, args[2])
+
+
+if __name__ == "__main__":
+    main()
