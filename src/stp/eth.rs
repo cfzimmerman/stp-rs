@@ -174,6 +174,10 @@ impl EthRouter {
             Self::send(&mut port.tx, &eth_pkt);
             return;
         }
+        println!(
+            "Flooding to unrecognized destination: {:#?}",
+            eth_pkt.get_destination()
+        );
 
         // flood to unknown destination
         for (portnum_out, port) in self.ports.iter_mut().enumerate() {
