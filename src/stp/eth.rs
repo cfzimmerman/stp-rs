@@ -38,11 +38,13 @@ impl EthPort {
     /// Builds an abstraction that supports sending and receiving network packets from
     /// an ethernet port. Receive blocks until a packet arries or `poll_timeout` has elapsed.
     pub fn build(
-        intf: NetworkInterface,
+        intf: &NetworkInterface,
         poll_timeout: Option<Duration>,
     ) -> anyhow::Result<(Self, Box<dyn DataLinkReceiver>)> {
-        let mut port_cfg = Config::default();
-        port_cfg.read_timeout = poll_timeout;
+        let port_cfg = Config {
+            read_timeout: poll_timeout,
+            ..Config::default()
+        };
         let Ok(Ethernet(tx, rx)) = datalink::channel(&intf, port_cfg) else {
             bail!("Failed to parse ethernet channel on interface: {:#?}", intf);
         };
@@ -104,7 +106,7 @@ impl EthRouter {
 
         let mn_name = format!("{switch_name}-eth");
         for intf in datalink::interfaces()
-            .into_iter()
+            .iter()
             .filter(|intf| intf.name.contains(&mn_name))
         {
             let (port, port_rx) = EthPort::build(intf, eth_poll_timeout)?;
@@ -124,7 +126,9 @@ impl EthRouter {
             curr_bpdu: Bpdu::new(0, switch_id, switch_id),
             bpdu_buf: Bpdu::make_buf(),
             bpdu_resend_timeout,
-            last_resent_bpdu: Instant::now() - bpdu_resend_timeout,
+            last_resent_bpdu: Instant::now()
+                .checked_sub(bpdu_resend_timeout)
+                .unwrap_or_else(|| Instant::now()),
             fwd_table: HashMap::new(),
         })
     }
@@ -150,7 +154,7 @@ impl EthRouter {
 
         if inbound_state == PortState::Block {
             // deny client packets from blocked ports.
-            eprintln!("Denied client packet on a blocked port: {:#?}", eth_pkt);
+            eprintln!("Denied client packet on a blocked port: {eth_pkt:#?}");
             return;
         };
 
@@ -170,7 +174,7 @@ impl EthRouter {
                 PortState::Block,
                 "The forwarding table shouldn't suggest blocked ports."
             );
-            Self::send(&mut port.tx, &eth_pkt);
+            Self::send(&mut port.tx, eth_pkt);
             return;
         }
 
@@ -257,11 +261,11 @@ impl EthRouter {
                         if e.kind() == ErrorKind::TimedOut {
                             continue;
                         }
-                        bail!("Exiting on io error: {:#?}", e);
+                        bail!("Exiting on io error: {e:#?}");
                     }
                 };
                 let Some(eth_pkt) = EthernetPacket::new(bytes) else {
-                    eprintln!("Failed to parse packet: {:#?}", bytes);
+                    eprintln!("Failed to parse packet: {bytes:#?}");
                     continue;
                 };
 
