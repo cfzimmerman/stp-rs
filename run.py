@@ -3,6 +3,7 @@ from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.cli import CLI
 import sys
+import os
 import time
 import json
 
@@ -89,6 +90,8 @@ def main():
     else:
         usage()
         return
+
+    os.system("cargo build --release")
     run(interactive, args[2])
 
 
