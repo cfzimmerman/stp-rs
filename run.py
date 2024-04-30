@@ -2,7 +2,7 @@ from mininet.node import Switch
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.cli import CLI
-import env
+import sys
 import time
 import json
 
@@ -96,7 +96,8 @@ def usage():
 
 
 if __name__ == "__main__":
-    if len(env.args) != 3:
+    args = sys.argv
+    if len(args) != 3:
         usage()
     else:
-        run(bool(env.args[1]), env.args[2])
+        run(bool(args[1]), args[2])
