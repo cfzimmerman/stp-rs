@@ -48,8 +48,9 @@ def main():
         server = net.get('h5')
         client = net.get('h1')
 
-        server.cmd("iperf -s &")
-        client.cmd(f"iperf -t {TEST_LEN_SEC} -c {server.IP()}")
+        server.cmd("mkdir -p logs && iperf -s > ./logs/iperf-server.txt &")
+        client.cmd(
+            f"iperf -t {TEST_LEN_SEC} -c {server.IP()} > ./logs/iperf-client.txt")
 
         net.stop()
         return
