@@ -208,12 +208,6 @@ impl EthRouter {
                 port.state = PortState::Block;
             }
         }
-        {
-            println!("Reset root:");
-            for (port_num, port) in self.ports.iter().enumerate() {
-                println!("num: {port_num}, state: {:?}", port.state);
-            }
-        }
         self.curr_bpdu = Bpdu::new(neighbor.cost() + 1, neighbor.root_id(), pkt.get_source());
     }
 
@@ -305,7 +299,10 @@ impl EthRouter {
                         println!("lower cost fwd: {:#?}", self.fwd_table);
                     }
                     Ordering::Equal => {
-                        self.ports[portnum_in].state = PortState::Block;
+                        let port = &mut self.ports[portnum_in];
+                        if port.state != PortState::Root {
+                            port.state = PortState::Block;
+                        }
                     }
                     Ordering::Greater => {
                         self.ports[portnum_in].state = if neighbor.bridge_id() == self.switch_id {
