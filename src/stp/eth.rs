@@ -174,6 +174,8 @@ impl EthRouter {
             Self::send(&mut port.tx, &eth_pkt);
             return;
         }
+
+        /*
         println!(
             "Flooding to unrecognized destination: {:#?}",
             eth_pkt.get_destination()
@@ -186,6 +188,7 @@ impl EthRouter {
             }
             Self::send(&mut port.tx, eth_pkt);
         }
+        */
     }
 
     /// Makes a control packet with the current bpdu and sends it to all neighbors
