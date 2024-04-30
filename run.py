@@ -68,7 +68,7 @@ def run(interactive: bool, topo_file: str):
 
 def usage():
     print("**.py [interactive/quiet -i/q] [topology filepath]")
-    print("sudo python run.py -q ./topos/topo.json")
+    print("sudo python run.py -q ./topo/topo.json")
 
 
 def main():

@@ -32,6 +32,8 @@ def main():
         return
 
     if mode == "perf":
+        TEST_LEN_SEC = 60
+
         topo = test_runner.EtherTopo("./topo/grid.json")
 
         print(topo.hosts())
@@ -43,7 +45,11 @@ def main():
         print(f"sleeping for {sleep_sec} sec, let STP set up")
         time.sleep(sleep_sec)
 
-        # run iperf!
+        server = net.get('h5')
+        client = net.get('h1')
+
+        server.cmd("iperf -s &")
+        client.cmd(f"iperf -t {TEST_LEN_SEC} -c {server.IP()}")
 
         net.stop()
         return
