@@ -45,7 +45,7 @@ def main():
         print(f"sleeping for {sleep_sec} sec, let STP set up")
         time.sleep(sleep_sec)
 
-        ploss = net.ping(hosts=['h1', 'h5'], seconds=10)
+        ploss = net.ping(hosts=['h1', 'h5'], timeout=10)
         print(ploss)
 
         '''
