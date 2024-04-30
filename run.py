@@ -2,6 +2,9 @@ from mininet.node import Switch
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.cli import CLI
+import env
+import time
+import json
 
 
 RELEASE_EXECUTABLE = "./target/release/stp-rs"
@@ -24,9 +27,28 @@ class EtherSwitch(Switch):
 
 
 class EtherTopo(Topo):
-    def build(self):
-        # TODO: make the topology parameter driven
+    def __init__(self, topo_file: str):
+        self.topo_file = topo_file
 
+    def build(self):
+        with open(self.topo_file, 'r') as topo_file:
+            topo = json.loads(topo_file.read())
+            hosts = list(topo["topology"]["hosts"].keys())
+            hosts.sort()
+            for ind, host in enumerate(hosts):
+                mac_addr = f'02:00:00:00:00:0{ind + 1}'
+                print(f"adding host {host} at {mac_addr}")
+                self.addHost(host, mac=mac_addr)
+
+            for switch in topo["topology"]["switches"]:
+                print(f"adding switch: {switch}")
+                self.addSwitch(switch, cls=EtherSwitch)
+
+            for link in topo["topology"]["links"]:
+                print(f"adding link: {link}")
+                self.addLink(link[0], link[1])
+
+        '''
         s1 = self.addSwitch('s1', cls=EtherSwitch)
         s2 = self.addSwitch('s2', cls=EtherSwitch)
         s3 = self.addSwitch('s3', cls=EtherSwitch)
@@ -42,6 +64,7 @@ class EtherTopo(Topo):
         self.addLink(s1, s2)
         self.addLink(s1, s3)
         self.addLink(s2, s3)
+        '''
 
         # s1 = self.addSwitch('s1', cls=EtherSwitch)
 
@@ -52,16 +75,28 @@ class EtherTopo(Topo):
         # self.addLink(h2, s1)
 
 
-def run():
-    topo = EtherTopo()
+def run(interactive: bool, topo_file: str):
+    topo = EtherTopo(topo_file)
     net = Mininet(topo=topo)
     net.start()
 
-    # net.pingAll()
-    CLI(net)
+    if interactive:
+        CLI(net)
+    else:
+        # Give the network time to run stp
+        time.sleep(1)
+        net.pingAll()
 
     net.stop()
 
 
+def usage():
+    print("**.py [bool interactive] [topology filepath]")
+    print("sudo python run.py true ./topos/topo.json")
+
+
 if __name__ == "__main__":
-    run()
+    if len(env.args) != 3:
+        usage()
+    else:
+        run(bool(env.args[1]), env.args[2])
