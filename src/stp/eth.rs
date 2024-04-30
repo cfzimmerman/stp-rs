@@ -234,12 +234,13 @@ impl EthRouter {
         loop {
             if init_phase && time_entered.elapsed() > startup_duration {
                 for port in &mut self.ports {
+                    println!("after port: {:?}", port.state);
                     // Assume by now that all ports that aren't otherwise assigned
                     // are either silent or hosts.
                     if port.state == PortState::Learning {
                         port.state = PortState::Forward;
                     }
-                    println!("port: {:?}", port.state);
+                    println!("before port: {:?}", port.state);
                 }
                 println!("Exit init, fwd: {:#?}", self.fwd_table);
                 init_phase = false;
