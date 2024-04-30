@@ -4,6 +4,7 @@ To do:
   - Checkpoint that
 - Add more graceful handling for errors
 - Final review
+- How to evaluate performance?
 - Report
 
 Setup:
