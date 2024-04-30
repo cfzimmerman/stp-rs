@@ -45,15 +45,15 @@ def main():
         print(f"sleeping for {sleep_sec} sec, let STP set up")
         time.sleep(sleep_sec)
 
-        server_out, client_out = net.iperf(["h1", "h5"], seconds=5)
+        server = net.get('h5')
+        client = net.get('h1')
+        server_out, client_out = net.iperf([server, client], seconds=5)
 
         print(server_out)
         print(client_out)
 
         '''
 
-        server = net.get('h5')
-        client = net.get('h1')
 
         print(f"running iperf for {TEST_LEN_SEC} seconds")
         server_out = server.cmd(
