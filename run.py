@@ -39,7 +39,7 @@ class EtherTopo(Topo):
             # mac_addr = f'02:00:00:00:00:0{ind + 1}'
             # self.addHost(host, mac=mac_addr)
             h = self.addHost(host)
-            print(f"adding host {host} at {h.MAC()}")
+            print(f"adding host {host} at {h.MAC}")
 
         for switch in self.topo["topology"]["switches"]:
             print(f"adding switch: {switch}")
