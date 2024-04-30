@@ -163,7 +163,6 @@ impl EthRouter {
             return;
         }
 
-        println!("Forwarding data packet");
         // forward to known destination
         if let Some(next_hop) = self.fwd_table.get(&eth_pkt.get_destination()) {
             let port = &mut self.ports[*next_hop];
@@ -244,7 +243,6 @@ impl EthRouter {
                 init_phase = true;
             }
             if self.bpdu_resend_timeout < self.last_resent_bpdu.elapsed() {
-                println!("{:#?}", self.fwd_table);
                 self.broadcast_bpdu();
                 self.last_resent_bpdu = Instant::now();
             }
@@ -277,6 +275,7 @@ impl EthRouter {
                     Ordering::Less => {
                         self.reset_root(portnum_in, neighbor, &eth_pkt);
                         self.broadcast_bpdu();
+                        println!("lower root fwd: {:#?}", self.fwd_table);
                         continue;
                     }
                     Ordering::Greater => {
@@ -294,6 +293,7 @@ impl EthRouter {
                     Ordering::Less => {
                         self.reset_root(portnum_in, neighbor, &eth_pkt);
                         self.broadcast_bpdu();
+                        println!("lower cost fwd: {:#?}", self.fwd_table);
                     }
                     Ordering::Equal => {
                         self.ports[portnum_in].state = PortState::Block;

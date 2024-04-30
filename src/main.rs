@@ -8,7 +8,7 @@ fn main() -> anyhow::Result<()> {
     };
     let switch = EthRouter::build(
         &switch_name,
-        Duration::from_secs(5),
+        Duration::from_secs(10),
         Some(Duration::from_micros(1000)),
     )?;
     Ok(switch.run(Duration::from_millis(500))?)

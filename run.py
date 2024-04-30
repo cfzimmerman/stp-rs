@@ -27,7 +27,7 @@ class EtherTopo(Topo):
     def build(self):
         # TODO: make the topology parameter driven
 
-        s1 = self.addSwitch('s1', cls=EtherSwitch, mac='00:00:00:00:00:01')
+        s1 = self.addSwitch('s1', cls=EtherSwitch, mac=f'00:00:00:00:00:0{1}')
         s2 = self.addSwitch('s2', cls=EtherSwitch)
         s3 = self.addSwitch('s3', cls=EtherSwitch)
 
