@@ -28,28 +28,27 @@ class EtherSwitch(Switch):
 
 class EtherTopo(Topo):
     def __init__(self, topo_file: str, **kwargs):
-        self.topo_file = topo_file
+        with open(topo_file, 'r') as topo_file:
+            self.topo = json.loads(topo_file.read())
+            print(self.topo)
         super(EtherTopo, self).__init__(**kwargs)
 
     def build(self):
-        with open(self.topo_file, 'r') as topo_file:
-            topo = json.loads(topo_file.read())
-            print(topo)
-            hosts = list(topo["topology"]["hosts"].keys())
-            print(hosts)
-            hosts.sort()
-            for ind, host in enumerate(hosts):
-                mac_addr = f'02:00:00:00:00:0{ind + 1}'
-                print(f"adding host {host} at {mac_addr}")
-                self.addHost(host, mac=mac_addr)
+        hosts = list(self.topo["topology"]["hosts"].keys())
+        print(hosts)
+        hosts.sort()
+        for ind, host in enumerate(hosts):
+            mac_addr = f'02:00:00:00:00:0{ind + 1}'
+            print(f"adding host {host} at {mac_addr}")
+            self.addHost(host, mac=mac_addr)
 
-            for switch in topo["topology"]["switches"]:
-                print(f"adding switch: {switch}")
-                self.addSwitch(switch, cls=EtherSwitch)
+        for switch in self.topo["topology"]["switches"]:
+            print(f"adding switch: {switch}")
+            self.addSwitch(switch, cls=EtherSwitch)
 
-            for link in topo["topology"]["links"]:
-                print(f"adding link: {link}")
-                self.addLink(link[0], link[1])
+        for link in self.topo["topology"]["links"]:
+            print(f"adding link: {link}")
+            self.addLink(link[0], link[1])
 
         '''
         s1 = self.addSwitch('s1', cls=EtherSwitch)
