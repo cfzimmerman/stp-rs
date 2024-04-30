@@ -1,0 +1,12 @@
+mininet> h1 iperf -u -c fe80::7c5e:91ff:fee3:c4b9 
+write failed: Destination address required
+------------------------------------------------------------
+Client connecting to fe80::7c5e:91ff:fee3:c4b9, UDP port 5001
+Sending 1470 byte datagrams, IPG target: 11215.21 us (kalman adjust)
+UDP buffer size:  224 KByte (default)
+------------------------------------------------------------
+[  3] local 0.0.0.0 port 0 connected with :: port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3]  0.0- 0.0 sec  0.00 Bytes  0.00 bits/sec
+[  3] Sent 0 datagrams
+[  3] WARNING: did not receive ack of last datagram after 10 tries.
