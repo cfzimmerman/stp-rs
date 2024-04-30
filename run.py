@@ -62,7 +62,7 @@ def run(interactive: bool, topo_file: str):
     if interactive:
         CLI(net)
     else:
-        sleep_sec = 1
+        sleep_sec = 2
         print(f"sleeping for {sleep_sec} sec, let STP set up")
         time.sleep(sleep_sec)
         net.pingAll()
