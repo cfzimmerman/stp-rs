@@ -53,6 +53,7 @@ def main():
         client.cmd(
             f"iperf -t {TEST_LEN_SEC} -c {server.IP()} > ./logs/iperf-client.txt")
 
+        # cmdPrint instead?
         print("test complete, cleaning up")
         server.cmd('kill %iperf')
 
