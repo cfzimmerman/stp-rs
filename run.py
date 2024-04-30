@@ -35,11 +35,15 @@ class EtherTopo(Topo):
     def build(self):
         hosts = list(self.topo["topology"]["hosts"].keys())
         hosts.sort()
-        for ind, host in enumerate(hosts):
-            # mac_addr = f'02:00:00:00:00:0{ind + 1}'
-            # self.addHost(host, mac=mac_addr)
-            h = self.addHost(host)
-            print(f"adding host {host} at {h.MAC}")
+
+        # for ind, host in enumerate(hosts):
+        #     mac_addr = f'02:00:00:00:00:0{ind + 1}'
+        #     print(f"adding host {host} at {mac_addr}")
+        #     self.addHost(host, mac=mac_addr)
+
+        for host in hosts:
+            print(f"adding host: {host}")
+            self.addHost(host)
 
         for switch in self.topo["topology"]["switches"]:
             print(f"adding switch: {switch}")
