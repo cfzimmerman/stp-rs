@@ -1,14 +1,13 @@
-use std::mem;
-
 use bytemuck::{Pod, Zeroable};
 use pnet::{
     packet::ethernet::{EthernetPacket, MutableEthernetPacket},
     util::MacAddr,
 };
+use std::mem;
 
-/// A bridge protocol data unit packet. Note, this is not authentic. I'm
+/// A bridge protocol data unit packet. This is not full-spec. I'm
 /// choosing a subset of fields and using aligned data types instead of
-/// protocol field sizes. This is simply for ease of implementation.
+/// protocol field sizes for ease of implementation.
 /// Assumes packets are unversioned and for spanning tree.
 /// https://support.huawei.com/enterprise/en/doc/EDOC1000178168/e99e1364/bpdu-format
 #[repr(C)]
@@ -29,7 +28,7 @@ impl Bpdu {
     /// https://notes.networklessons.com/stp-bpdu-destination-mac-address
     pub const BPDU_MAC: MacAddr = MacAddr(0x01, 0x80, 0xc2, 0x0, 0x0, 0x0);
 
-    /// Builds a new bpdu type, casting MacAddresses into raw octets to satisfy bytemuck.
+    /// Builds a new bpdu type, casting Mac addresses into raw octets to satisfy bytemuck.
     pub fn new(root_cost: u8, root_id: MacAddr, bridge_id: MacAddr) -> Self {
         Bpdu {
             root_cost,
