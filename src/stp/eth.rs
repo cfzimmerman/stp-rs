@@ -170,12 +170,9 @@ impl EthRouter {
                 PortState::Block,
                 "The forwarding table shouldn't suggest blocked ports."
             );
-            println!("fwd {:?} to {next_hop}", eth_pkt.get_destination());
             Self::send(&mut port.tx, &eth_pkt);
             return;
         }
-
-        println!("Flooding to unkown: {:?}", eth_pkt.get_destination());
 
         // flood to unknown destination
         for (portnum_out, port) in self.ports.iter_mut().enumerate() {
