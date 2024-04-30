@@ -91,7 +91,6 @@ def main():
         usage()
         return
 
-    os.system("cargo build --release")
     run(interactive, args[2])
 
 
