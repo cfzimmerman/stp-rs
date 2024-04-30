@@ -239,7 +239,9 @@ impl EthRouter {
                     if port.state == PortState::Learning {
                         port.state = PortState::Forward;
                     }
+                    println!("port: {:?}", port.state);
                 }
+                println!("Exit init, fwd: {:#?}", self.fwd_table);
                 init_phase = true;
             }
             if self.bpdu_resend_timeout < self.last_resent_bpdu.elapsed() {
