@@ -50,7 +50,6 @@ class EtherTopo(Topo):
 
 
 def run(interactive: bool, topo_file: str):
-    print(f"interactive? {interactive}, {sys.argv[1]}")
     topo = EtherTopo(topo_file)
     net = Mininet(topo=topo)
     net.start()
