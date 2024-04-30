@@ -30,12 +30,10 @@ class EtherTopo(Topo):
     def __init__(self, topo_file: str, **kwargs):
         with open(topo_file, 'r') as topo_file:
             self.topo = json.loads(topo_file.read())
-            print(self.topo)
         super(EtherTopo, self).__init__(**kwargs)
 
     def build(self):
         hosts = list(self.topo["topology"]["hosts"].keys())
-        print(hosts)
         hosts.sort()
         for ind, host in enumerate(hosts):
             mac_addr = f'02:00:00:00:00:0{ind + 1}'
