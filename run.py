@@ -33,7 +33,9 @@ class EtherTopo(Topo):
     def build(self):
         with open(self.topo_file, 'r') as topo_file:
             topo = json.loads(topo_file.read())
+            print(topo)
             hosts = list(topo["topology"]["hosts"].keys())
+            print(hosts)
             hosts.sort()
             for ind, host in enumerate(hosts):
                 mac_addr = f'02:00:00:00:00:0{ind + 1}'
