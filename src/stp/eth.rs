@@ -244,7 +244,6 @@ impl EthRouter {
             }
 
             if self.bpdu_resend_timeout < self.last_resent_bpdu.elapsed() {
-                println!("fwd: {:#?}", self.fwd_table);
                 self.broadcast_bpdu();
                 self.last_resent_bpdu = Instant::now();
             }
