@@ -29,7 +29,7 @@ class EtherSwitch(Switch):
 class EtherTopo(Topo):
     def __init__(self, topo_file: str, **kwargs):
         self.topo_file = topo_file
-        super(EtherTopo, self).__init__(topo_file, **kwargs)
+        super(EtherTopo, self).__init__(**kwargs)
 
     def build(self):
         with open(self.topo_file, 'r') as topo_file:
