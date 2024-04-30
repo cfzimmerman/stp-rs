@@ -159,7 +159,6 @@ impl EthRouter {
 
         if inbound_state == PortState::Learning {
             // No forwarding during learning
-            println!("dbg: learned from packet, not forwarding");
             return;
         }
 
@@ -234,18 +233,17 @@ impl EthRouter {
         loop {
             if init_phase && time_entered.elapsed() > startup_duration {
                 for port in &mut self.ports {
-                    println!("after port: {:?}", port.state);
                     // Assume by now that all ports that aren't otherwise assigned
                     // are either silent or hosts.
                     if port.state == PortState::Learning {
                         port.state = PortState::Forward;
                     }
-                    println!("before port: {:?}", port.state);
                 }
-                println!("Exit init, fwd: {:#?}", self.fwd_table);
                 init_phase = false;
             }
+
             if self.bpdu_resend_timeout < self.last_resent_bpdu.elapsed() {
+                println!("fwd: {:#?}", self.fwd_table);
                 self.broadcast_bpdu();
                 self.last_resent_bpdu = Instant::now();
             }
@@ -270,15 +268,12 @@ impl EthRouter {
                     continue;
                 };
 
-                println!("{:?}", self.curr_bpdu);
-
                 // first take the smaller root id
                 // then take the shortest path to the smallest root id
                 let agree_on_root = match neighbor.root_id().cmp(&self.curr_bpdu.root_id()) {
                     Ordering::Less => {
                         self.reset_root(portnum_in, neighbor, &eth_pkt);
                         self.broadcast_bpdu();
-                        println!("lower root fwd: {:#?}", self.fwd_table);
                         continue;
                     }
                     Ordering::Greater => {
@@ -296,7 +291,6 @@ impl EthRouter {
                     Ordering::Less => {
                         self.reset_root(portnum_in, neighbor, &eth_pkt);
                         self.broadcast_bpdu();
-                        println!("lower cost fwd: {:#?}", self.fwd_table);
                     }
                     Ordering::Equal => {
                         let port = &mut self.ports[portnum_in];
