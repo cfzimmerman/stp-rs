@@ -19,7 +19,7 @@ def main():
     if args[1] == "corr":
         mode = "corr"
     elif args[1] == "perf":
-        mode == "perf"
+        mode = "perf"
     else:
         usage()
         return
