@@ -15,8 +15,11 @@ use std::{
     time::{Duration, Instant},
 };
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 enum PortState {
+    /// The initial state. Packets aren't forwarded, but origins are added
+    /// to the forwarding table.
+    Learning,
     /// The port is the switch's path to the root. All traffic is served.
     Root,
     /// This port is part of a loop. Only BPDU packets are accepted.
@@ -49,7 +52,7 @@ impl EthPort {
         Ok((
             Self {
                 mac,
-                state: PortState::Block,
+                state: PortState::Learning,
                 tx,
             },
             rx,
@@ -142,16 +145,25 @@ impl EthRouter {
             Bpdu::BPDU_MAC,
             "These should only be host to host packets"
         );
-        if self.ports[portnum_in].state == PortState::Block {
+
+        let inbound_state = self.ports[portnum_in].state;
+
+        if inbound_state == PortState::Block {
             // deny client packets from blocked ports.
             eprintln!("Denied client packet on a blocked port: {:#?}", eth_pkt);
             return;
         };
-        // println!("Forwarding data packet");
 
         // self learning
         *self.fwd_table.entry(eth_pkt.get_source()).or_default() = portnum_in;
 
+        if inbound_state == PortState::Learning {
+            // No forwarding during learning
+            println!("dbg: learned from packet, not forwarding");
+            return;
+        }
+
+        println!("Forwarding data packet");
         // forward to known destination
         if let Some(next_hop) = self.fwd_table.get(&eth_pkt.get_destination()) {
             let port = &mut self.ports[*next_hop];
@@ -201,6 +213,9 @@ impl EthRouter {
     }
 
     /// Runs packet control and forwarding as long as the network is live.
+    /// Startup duration is the amount of time switches spend learning the
+    /// topology and negotiating the spanning tree before beginning to route
+    /// host packets. Recommended between 500 ms and 2 seconds.
     ///
     /// There were two accessible ways to implement this given the constraints of
     /// the pnet channel: (1) spawn a thread for each port and send
@@ -210,11 +225,24 @@ impl EthRouter {
     /// run +16 switches on a single emulated network on qemu on a macbook. There
     /// will be zero free cores no matter what, so a busy loop actually seems
     /// more efficient than multithreading + blocking in this situation.
-    pub fn run(mut self) -> anyhow::Result<()> {
+    pub fn run(mut self, startup_duration: Duration) -> anyhow::Result<()> {
         let mut inbound = mem::take(&mut self.inbound);
         assert_eq!(inbound.len(), self.ports.len());
 
+        let time_entered = Instant::now();
+        let mut init_phase = false;
+
         loop {
+            if init_phase && time_entered.elapsed() > startup_duration {
+                for port in &mut self.ports {
+                    // Assume by now that all ports that aren't otherwise assigned
+                    // are either silent or hosts.
+                    if port.state == PortState::Learning {
+                        port.state = PortState::Forward;
+                    }
+                }
+                init_phase = true;
+            }
             if self.bpdu_resend_timeout < self.last_resent_bpdu.elapsed() {
                 println!("{:#?}", self.fwd_table);
                 self.broadcast_bpdu();

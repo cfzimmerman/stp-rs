@@ -11,5 +11,5 @@ fn main() -> anyhow::Result<()> {
         Duration::from_secs(5),
         Some(Duration::from_micros(1000)),
     )?;
-    Ok(switch.run()?)
+    Ok(switch.run(Duration::from_millis(500))?)
 }
