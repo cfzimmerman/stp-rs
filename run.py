@@ -20,7 +20,7 @@ class EtherSwitch(Switch):
 
     def start(self, controllers):
         self.cmd(
-            f'{RELEASE_EXECUTABLE} {self.name} > "logs/{self.name}-log.txt" &')
+            f'mkdir -p logs && {RELEASE_EXECUTABLE} {self.name} > "logs/{self.name}-log.txt" &')
 
     def stop(self):
         self.cmd(f'kill {RELEASE_EXECUTABLE}')
