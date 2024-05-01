@@ -1,60 +1,19 @@
 use anyhow::bail;
-use pnet::{
-    datalink::{self, Channel::Ethernet, Config, NetworkInterface},
-    packet::{
-        ethernet::{EthernetPacket, MutableEthernetPacket},
-        MutablePacket, Packet,
-    },
-};
+use std::time::Duration;
+use stp_rs::stp::eth::EthSwitch;
 
-struct EthRouter {}
+/// How often switches broadcast their routing state to neighbors
+const BPDU_RESEND_FREQ: Duration = Duration::from_secs(2);
 
-impl EthRouter {
-    pub fn build() -> anyhow::Result<Self> {
-        // filters out all ethernet interfaces that don't have mininet names
-        let mn_intf: Vec<NetworkInterface> = datalink::interfaces()
-            .into_iter()
-            .filter(|intf| intf.name.contains("-eth"))
-            .collect();
-
-        println!("interfaces: {:#?}", mn_intf);
-
-        let Ok(Ethernet(_i1_tx, mut i1_rx)) = datalink::channel(&mn_intf[0], Config::default())
-        else {
-            bail!(
-                "Failed to parse ethernet channel on interface: {:#?}",
-                mn_intf[0]
-            );
-        };
-
-        let Ok(Ethernet(mut i2_tx, _i2_rx)) = datalink::channel(&mn_intf[1], Config::default())
-        else {
-            bail!(
-                "Failed to parse ethernet channel on interface: {:#?}",
-                mn_intf[1]
-            );
-        };
-
-        println!("Entering packet loop");
-
-        while let Ok(i1_pkt) = i1_rx.next() {
-            let Some(eth_pkt) = EthernetPacket::new(i1_pkt) else {
-                eprintln!("Failed to parse packet: {:#?}", i1_pkt);
-                continue;
-            };
-
-            i2_tx.build_and_send(1, eth_pkt.packet().len(), &mut |outbound| {
-                let mut outbound = MutableEthernetPacket::new(outbound)
-                    .expect("MutableEthernetPacket must construct successfully");
-                outbound.clone_from(&eth_pkt);
-            });
-        }
-
-        Ok(EthRouter {})
-    }
-}
+/// How long a switch is allowed to wait for an ethernet packet to
+/// arrive on a specific port. All relevant ports are polled in an
+/// event loop.
+const SWITCH_TICK_SPEED: Option<Duration> = Some(Duration::from_micros(1000));
 
 fn main() -> anyhow::Result<()> {
-    EthRouter::build()?;
-    Ok(())
+    let Some(switch_name) = std::env::args().nth(1) else {
+        bail!("First argument must be the switch name");
+    };
+    let switch = EthSwitch::build(&switch_name, BPDU_RESEND_FREQ, SWITCH_TICK_SPEED)?;
+    switch.run(Duration::from_millis(500))
 }

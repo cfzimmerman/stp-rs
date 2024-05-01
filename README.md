@@ -1,4 +1,8 @@
-todo:
+To do:
+
+- Report
+
+- Missing: soft state, failure recovery
 
 Setup:
 
