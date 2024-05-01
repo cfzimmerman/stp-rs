@@ -1,7 +1,5 @@
 To do:
 
-- How to evaluate performance?
-- Final review
 - Report
 
 - Missing: soft state, failure recovery
