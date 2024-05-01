@@ -10,10 +10,14 @@ const BPDU_RESEND_FREQ: Duration = Duration::from_secs(2);
 /// event loop.
 const SWITCH_TICK_SPEED: Option<Duration> = Some(Duration::from_micros(1000));
 
+/// How long switches stay in their initial learning mode before
+/// beginning to forward host packets.
+const STARTUP_DURATION: Duration = Duration::from_millis(1000);
+
 fn main() -> anyhow::Result<()> {
     let Some(switch_name) = std::env::args().nth(1) else {
         bail!("First argument must be the switch name");
     };
     let switch = EthSwitch::build(&switch_name, BPDU_RESEND_FREQ, SWITCH_TICK_SPEED)?;
-    switch.run(Duration::from_millis(500))
+    switch.run(STARTUP_DURATION)
 }
