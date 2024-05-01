@@ -1,6 +1,6 @@
 # Self learning loop free Ethernet switches
 
-_Cory Zimmerman_
+_Cory Zimmerman_  
 _CS 145, Spring 2024_
 
 This project demonstrates functional control software for self-learning Layer 2 Ethernet switches. The Rust executable can be run on Mininet switches for full Layer 2 connectivity.
