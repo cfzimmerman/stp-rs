@@ -5,12 +5,14 @@ _CS 145, Spring 2024_
 
 This project demonstrates functional control software for self-learning Layer 2 Ethernet switches. The Rust executable can be run on Mininet switches for full Layer 2 connectivity.
 
+[Video](https://youtu.be/quDgQE4ZLNw?si=f-zVXcWzp9Vm02G9)
+
 ### Overview
 The switch program achieves partial but not full Spanning Tree Protocol (STP) functionality. Following the protocol, switches run a state machine for each port to elect a root node by minimum MAC address and forward packets along a spanning tree.
 
 Each port carries read and write buffers with an associated Ethernet interface. Inflow data is inspected, and host packets copied directly to the outflow buffer according to the forwarding table. Unrecognized destinations are flooded. Control packets (BPDUs) are inspected and processed according to STP rules and current port states. Switches also occasionally flood their BPDU to neighbors.
 
-Deviations from pure STP are due largely to time and platform constraints. My BPDUs use a subset of protocol-spec packet fields, and mine use default aligned data types for simplicity. Also, my forwarding table is hard state, and my network thus does not properly handle link failure. Converting this protocol to handle link failure would require shifting switches toward all soft state and detecting link fail/join events. I pursued other aspects of the project instead of failure recovery because I couldn’t figure out how to simulate and test link failure in Mininet.
+Deviations from pure STP are due largely to time and platform constraints. My BPDUs use a subset of protocol-spec packet fields, and mine use default number types for simplicity. Also, my forwarding tables are hard state, and my network does not attempt to recover from link failure. Modifying this project to handle link failure would require shifting switches toward all soft state and detecting link fail/join events. I pursued other aspects of the project instead of failure recovery because I couldn’t figure out how to simulate and test link failure in Mininet.
 
 ### Code:
 Python Mininet code is used to run the networks. In [run.py](run.py), the same topology.json` format we used in the datacenter projects is parsed and built into a Mininet network. Each switch in the network runs the Rust executable.
