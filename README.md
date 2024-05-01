@@ -25,8 +25,20 @@ The networking library I used, `pnet`, uses channels (Rust read/write queues) to
 ### Testing:
 
 I ran my network on the CS 145 VM, although I believe it should work on any Linux machine with Mininet installed.
-- Clone the repo.
 - Install Rust: https://www.rust-lang.org/tools/install
 	- Restart or source your terminal so that `cargo` is in your path.
-- Run `cargo build —release` to build the executable that the Mininet setup script will search for.
-- Run sudo python tests.py to run connectivity tests. This script builds networks from all the topology files in the topo directory and calls pingall. To engage more with a single topology or to run a single test, use sudo python run.py [args]. Call the script with no args for options. To run, for example, the triangle with the Mininet CLI, call sudo python run.py -i ./topo/triangle.json. If you’re curious about the topologies, I put a picture of each in that directory as well. The file ftree16.json is the four-port fat tree from project 1.
+- Clone the repo and `cd stp-rs`.
+- Run `cargo build --release` to build the executable that the Mininet setup script will search for.
+- Run `sudo python tests.py` to run connectivity tests. This script builds networks from all the topology files in the `topo` directory and calls `pingall` before exiting. To engage more with a single topology or to run a single test, use `sudo python run.py [args]`. Call the script with no args to print options. For example, to load the triangle and start the Mininet CLI, call `sudo python run.py -i ./topo/triangle.json`. If you’re curious about the topologies, I put a picture of each next to the json file. The file `ftree16.json` is the four-port fat tree from project 1.
+
+### Analysis:
+
+This project primarily focused on correctness. The switches consistently pass the `pingall` tests for all networks, so I feel positive about their correctness in absence of link failures.
+
+As mentioned in the challenges section, my switches poll each Ethernet port for updates in a busy loop. Each polling attempt waits for a certain amount of time before giving up. Then, the switch moves on to the next port. This incidentally forms a proxy for how fast my switch hardware is, so I explored the effect of different timeout values on round trip time. Additionally, because MAC addresses in my networks are randomly assigned, every run of the network generates a new spanning tree (a random switch has the lowest MAC), which also offered an opportunity to explore the impact of spanning tree root placement on network performance.
+
+I ran ping flows from the top left to the bottom right of the grid topology. Each test for each poll timeout assignment made 25 round trips, counting average RTT. Results can be found here: https://docs.google.com/spreadsheets/d/1TGr41xT13IpTGZ-qCWeuO5A9ZOJwou8CnrbcFv1s4JA/edit
+
+A poll timeout of 100 microseconds performed best. The 2000 microsecond timeout was effectively switch hardware running 20 times slower, and the network running faster switches accomplished about five RTTs for every one RTT in the slower network. I’m guessing the 10 microsecond switches were a bit worse because my laptop was already under heavy load, and a loop this fast was likely more context switching than was really worthwhile.
+
+It was also interesting seeing variance between trials. Each CSV row represents a different assignment of MAC addresses and a randomly chosen STP root. Even on a fairly balanced grid topology, I suspect unfavorable root node assignment had an impact on runs that were particularly slow compared to average. 
