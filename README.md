@@ -32,6 +32,7 @@ I ran my network on the CS 145 VM, although I believe it should work on any Linu
 - Clone the repo and `cd stp-rs`.
 - Run `cargo build --release` to build the executable that the Mininet setup script will search for.
 - Run `sudo python tests.py` to run connectivity tests. This script builds networks from all the topology files in the `topo` directory and calls `pingall` before exiting. To explore a specific topology or to run a single test, use `sudo python run.py [args]`. Call the script with no args to print options. For example, to load the triangle and start the Mininet CLI, call `sudo python run.py -i ./topo/triangle.json`. If you’re curious about the topologies, I put a picture of each next to the json file. The file `ftree16.json` is the four-port fat tree from project 1.
+- Note: `pingall` has failed for me a few times, but I wasn't able to find a deterministic cause. When this happens, please stop the network, run `sudo mn -c`, and try again.
 
 ### Analysis:
 
