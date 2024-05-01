@@ -8,7 +8,7 @@ const BPDU_RESEND_FREQ: Duration = Duration::from_secs(2);
 /// How long a switch is allowed to wait for an ethernet packet to
 /// arrive on a specific port. All relevant ports are polled in an
 /// event loop.
-const SWITCH_TICK_SPEED: Option<Duration> = Some(Duration::from_micros(100));
+const SWITCH_TICK_SPEED: Option<Duration> = Some(Duration::from_micros(10));
 
 fn main() -> anyhow::Result<()> {
     let Some(switch_name) = std::env::args().nth(1) else {
