@@ -18,17 +18,18 @@ pub struct Bpdu {
     bridge_id: [u8; 6],
 }
 
-/// A wrapper over a buffer used to construct Bpdu packets. All Bpdu
+/// A buffer used to construct Bpdu packets. All Bpdu
 /// packets have the same size and are sent one at a time, so this is
 /// just a nice way to reuse a single allocation for all packet construction.
 pub struct BpduBuf(pub Vec<u8>);
 
 impl Bpdu {
-    /// This is a reserved mac address often used for layer 2 protocols like STP
+    /// A reserved MAC address often used for layer 2 protocols like STP
     /// https://notes.networklessons.com/stp-bpdu-destination-mac-address
     pub const BPDU_MAC: MacAddr = MacAddr(0x01, 0x80, 0xc2, 0x0, 0x0, 0x0);
 
-    /// Builds a new bpdu type, casting Mac addresses into raw octets to satisfy bytemuck.
+    /// Builds a new bpdu type, casting Mac addresses into raw octets that
+    /// satisfy bytemuck trait bounds.
     pub fn new(root_cost: u8, root_id: MacAddr, bridge_id: MacAddr) -> Self {
         Bpdu {
             root_cost,
@@ -61,7 +62,7 @@ impl Bpdu {
         self.bridge_id.into()
     }
 
-    /// Makes a bpdu ethernet packet in the given bpdu_buf.
+    /// Makes a bpdu ethernet packet in the given `bpdu_buf`.
     pub fn make_packet<'a>(
         &self,
         bpdu_buf: &'a mut BpduBuf,

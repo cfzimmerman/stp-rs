@@ -3,7 +3,6 @@ from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.cli import CLI
 import sys
-import os
 import time
 import json
 

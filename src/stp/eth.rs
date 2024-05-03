@@ -22,7 +22,7 @@ enum PortState {
     /// The initial state. Packets aren't forwarded, but origins are added
     /// to the forwarding table.
     Learning,
-    /// The port is the switch's path to the root. All traffic is served.
+    /// This port is the switch's path to the root. All traffic is served.
     Root,
     /// This port is part of a loop. Only BPDU packets are accepted.
     Block,
@@ -38,9 +38,9 @@ struct EthPort {
 }
 
 impl EthPort {
-    /// Builds an that supports sending and receiving network packets from
-    /// an ethernet port. Every attempt at receiving a packet blocks until
-    /// a packet arries or `poll_timeout` has elapsed.
+    /// Builds a port handle that supports sending and receiving network
+    /// packets from an ethernet port. Every attempt at receiving a
+    /// packet blocks until a packet arries or `poll_timeout` has elapsed.
     fn build(
         intf: &NetworkInterface,
         poll_timeout: Option<Duration>,
@@ -65,7 +65,8 @@ impl EthPort {
         ))
     }
 
-    /// Returns whether a packet is marked for the purpose of ethernet routing
+    /// If the given packet is for ethernet routing controls between switches,
+    /// returns the unpacked routing packet. Otherwise None.
     /// Panics if the packet matches the BPDU mac address but cannot be serialized.
     /// Such a case indicates a bug or some serious misunderstanding of the network.
     fn try_routing<'a>(pkt: &'a EthernetPacket) -> Option<&'a Bpdu> {
@@ -105,11 +106,10 @@ impl EthSwitch {
         let mut switch_id = MacAddr::broadcast();
 
         // Note: Port egress and ingress are separated because simultanous mutable
-        // borrows to both the tx and rx are almost always needed. That supports
-        // data flows requiring only a single copy from the ethernet inflow buffer into
-        // the outflow buffer.
+        // borrows to both the tx and rx are often needed. This enables single-copy
+        // routing from the inflow to the outflow ethernet buffer.
 
-        // Only mount to ethernet ports that follow the mininet naming convention.
+        // Only watch ethernet ports that follow the mininet naming convention.
         let mn_name = format!("{switch_name}-eth");
         for intf in datalink::interfaces()
             .iter()
@@ -143,15 +143,6 @@ impl EthSwitch {
     /// Startup duration is the amount of time switches spend learning the
     /// topology and negotiating the spanning tree before beginning to route
     /// host packets. Recommended between 500 ms and 2 seconds.
-    //
-    // There were two accessible ways to implement this given the constraints of
-    // the pnet channel: (1) spawn a thread for each port and send
-    // messages to a central handler via channel, or (2) poll ethernet
-    // ports in a busy loop.
-    // I'd do (1) if running a single process. However, I need to be able to
-    // run +20 switches on a single emulated network on qemu on a macbook. There
-    // will be zero free cores no matter what, so a busy loop actually seems
-    // more efficient than multithreading + blocking in this situation.
     pub fn run(mut self, startup_duration: Duration) -> anyhow::Result<()> {
         // Separating inbound tx from self allows self to be mutably borrowed
         // within the polling loop.
@@ -244,7 +235,7 @@ impl EthSwitch {
     }
 
     /// Sends the packet to the given outbound transmitter.
-    /// The given packet is copied directly into the send buffer.
+    /// The packet is copied directly into the send buffer.
     fn send(tx: &mut Box<dyn DataLinkSender>, pkt: &EthernetPacket) {
         tx.build_and_send(1, pkt.packet().len(), &mut |outbound| {
             outbound.clone_from_slice(pkt.packet());
@@ -310,8 +301,7 @@ impl EthSwitch {
         }
     }
 
-    /// Blocks the current root port, replacing it with the new root. Marks
-    /// the new root as root.
+    /// Blocks the current root port, replacing it with the new root.
     /// Also overwrites the current bpdu with the neighbor's cost-adjusted bpdu.
     fn reset_root(&mut self, new_root: usize, neighbor: &Bpdu, pkt: &EthernetPacket) {
         for (port_num, port) in self.ports.iter_mut().enumerate() {
